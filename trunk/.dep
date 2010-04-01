@@ -1,0 +1,29 @@
+batch_counting.o: batch_counting.cc npattern.h ngram.h string_utils.h \
+  vlist.h
+client_iterator.o: client_iterator.cc ngram_server.h client_iterator.h \
+  prefix_iterator.h string_utils.h sock.h
+client_iterator_test.o: client_iterator_test.cc client_iterator.h \
+  prefix_iterator.h
+index_ngrams.o: index_ngrams.cc
+ngram.o: ngram.cc ngram.h string_utils.h
+ngram_iterator.o: ngram_iterator.cc ngram_iterator.h prefix_iterator.h \
+  string_utils.h vlist.h npattern.h ngram.h
+ngram_server.o: ngram_server.cc ngram_iterator.h prefix_iterator.h sock.h \
+  vlist.h npattern.h ngram.h string_utils.h ngram_server.h
+ngram_server_test.o: ngram_server_test.cc ngram_server.h string_utils.h \
+  sock.h
+ngram_test.o: ngram_test.cc ngram.h string_utils.h
+npattern.o: npattern.cc npattern.h ngram.h string_utils.h vlist.h \
+  regulare.h prefix_iterator.h
+npattern_test.o: npattern_test.cc npattern.h ngram.h string_utils.h \
+  vlist.h
+regexp.o: regexp.cc regexp.h regmagic.h
+regulare.o: regulare.cc regulare.h regexp.h
+search_prefix_main.o: search_prefix_main.cc ngram_iterator.h \
+  prefix_iterator.h client_iterator.h npattern.h ngram.h string_utils.h \
+  vlist.h regulare.h
+sock.o: sock.cc sock.h
+string_utils.o: string_utils.cc string_utils.h
+sum_reducer.o: sum_reducer.cc reducer_input.h string_utils.h
+vlist.o: vlist.cc vlist.h
+vlist_test.o: vlist_test.cc vlist.h
