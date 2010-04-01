@@ -103,7 +103,7 @@ public:
    public:
     virtual ~Printer() {}
     virtual void Print(const string& key) {
-      cout << key;
+      cout << key << endl;
     }
   };
 
@@ -111,6 +111,7 @@ public:
     pat_ = 0;
     max_match_ = 0; log_count_ = false; uniq_count_ = false;
     printer_ = 0;
+    allow_partial_match_ = false;
   }
   virtual ~NgramInfoCollector() { delete pat_; delete printer_;}
 
@@ -162,6 +163,7 @@ protected:
   bool uniq_count_;
   int min_len_; // inclusive
   int max_len_; // inclusive
+  bool allow_partial_match_;
   static hash_map<string, NgramInfoCollector*, StringHash> protos;
 };
 

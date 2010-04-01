@@ -481,9 +481,9 @@ public:
 //    first.Print(cerr);
 //    cerr << "\n</first>" << endl;
     if (i + 1 == subs_.size()) {
-      for (int i = 0; i < first.size(); ++i) {
-	matches->Add(first[i]->Project(), this);
-	first[i] = 0;
+      for (int j = 0; j < first.size(); ++j) {
+	matches->Add(first[j]->Project(), this);
+	first[j] = 0;
       }
     }
     else if (i < subs_.size()) {
@@ -816,18 +816,33 @@ void NgramInfoCollector::Init(const Vlist& args) {
     log_count_ = true;
   if (args.HasLabel(":uniq-count"))
       uniq_count_ = true;
+  if (args.HasLabel(":allow-partial-match"))
+      allow_partial_match_ = true;
 }
 
 class PrintNgram : public NgramInfoCollector {
 public:
   NgramInfoCollector* clone() const { return new PrintNgram;}
   bool CollectInfo(const Ngram& ngram) {
-    NMatchVec matches;
-    if (pat_->Match(ngram, &matches)) {
-      printer()->Print(ngram.orig());
-      return true;
-    } else
-      return false;
+    if (allow_partial_match_) {
+      bool found = false;
+      for (int i = 0; i < ngram.Length(); ++i) {
+        NMatchVec matches;
+        pat_->PartialMatch(ngram, i, &matches);
+        if (!matches.empty()) {
+          printer()->Print(ngram.orig());
+          found = true;
+        }
+      }
+      return found;
+    } else {
+      NMatchVec matches;
+      if (pat_->Match(ngram, &matches)) {
+        printer()->Print(ngram.orig());
+        return true;
+      } else
+        return false;
+    }
   }
 };
 
@@ -852,12 +867,27 @@ public:
   }
   void Start() { counts_.clear();}
   bool CollectInfo(const Ngram& ngram) {
-    NMatchVec matches;
-    pat_->Match(ngram, &matches);
-    for (int i = 0; i < matches.size(); ++i) {
-      CollectFromOne(ngram, matches[i], GetCount(matches[i]->count));
+    if (allow_partial_match_) {
+      bool found = false;
+      for (int i = 0; i < ngram.Length(); ++i) {
+        NMatchVec matches;
+        pat_->PartialMatch(ngram, i, &matches);
+        if (!matches.empty()) {
+          for (int j = 0; j < matches.size(); ++j) {
+            CollectFromOne(ngram, matches[j], GetCount(matches[j]->count));
+          }
+          found = true;
+        }
+      }
+      return found;
+    } else {
+      NMatchVec matches;
+      pat_->Match(ngram, &matches);
+      for (int i = 0; i < matches.size(); ++i) {
+        CollectFromOne(ngram, matches[i], GetCount(matches[i]->count));
+      }
+      return !matches.empty();
     }
-    return !matches.empty();
   }
   void Flush() {
     if (counts_.empty()) {
@@ -902,6 +932,7 @@ public:
   void Start() {
     for (int i = 0; i < collectors_.size(); ++i) {
       collectors_[i]->Start();
+      collectors_[i]->set_printer(printer_);
     }
   }
   bool CollectInfo(const Ngram& ngram) {
@@ -914,6 +945,7 @@ public:
   void Flush() {
     for (int i = 0; i < collectors_.size(); ++i) {
       collectors_[i]->Flush();
+      collectors_[i]->set_printer(0);
     }
   }
   virtual void Init(const Vlist& args) {
@@ -1007,21 +1039,33 @@ public:
   };
   void Start() { counts_.clear();}
   bool CollectInfo(const Ngram& ngram) {
-    NMatchVec matches;
-    pat_->Match(ngram, &matches);
-    for (int i = 0; i < matches.size(); ++i) {
-      CollectFromOne(ngram, matches[i], GetCount(matches[i]->count));
+    if (allow_partial_match_) {
+      bool found = false;
+      for (int i = 0; i < ngram.Length(); ++i) {
+        NMatchVec matches;
+        pat_->PartialMatch(ngram, i, &matches);
+        if (!matches.empty()) {
+          for (int j = 0; j < matches.size(); ++j) {
+            CollectFromOne(ngram, matches[j], GetCount(matches[j]->count));
+          }
+          found = true;
+        }
+      }
+      return found;
+    } else {
+      NMatchVec matches;
+      pat_->Match(ngram, &matches);
+      for (int i = 0; i < matches.size(); ++i) {
+        CollectFromOne(ngram, matches[i], GetCount(matches[i]->count));
+      }
+      return !matches.empty();
     }
-    return !matches.empty();
   }
   void Flush() {
     for (hash_map<string, int64, StringHash>::iterator
 	     i = counts_.begin(); i != counts_.end(); ++i) {
-      if (!output_separator_.empty())
-	printer()->Print(StringPrintf("%s\t%lld%s", i->first.c_str(), i->second,
-				      output_separator_.c_str()));
-      else
-	printer()->Print(StringPrintf("%s\t%lld", i->first.c_str(), i->second));
+      printer()->Print(StringPrintf("%s\t%lld%s", i->first.c_str(), i->second,
+                                    output_separator_.c_str()));
     }
   }
   NgramInfoCollector* clone() const { return new CountNamed;}
