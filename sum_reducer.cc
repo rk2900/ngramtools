@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "reducer_input.h"
 #include "string_utils.h"
 

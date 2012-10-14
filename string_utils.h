@@ -15,8 +15,11 @@
 
 #ifdef WS09
 #include <stdarg.h>
-#include <ext/hash_map>
-#include <ext/hash_set>
+#include <unordered_map>
+#include <unordered_set>
+
+#define hash_map unordered_map
+#define hash_set unordered_set
 
 using namespace __gnu_cxx;
 using namespace std;

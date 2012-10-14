@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <cstring>
 
 #include "string_utils.h"
 
@@ -76,7 +77,7 @@ struct Rec {
   Rec() { int_var = 0; bool_var = 0; double_var = 0; string_var = 0;}
 };
 
-static map<string, Rec> args;
+static map<string, Rec>* args = 0;
 
 void ParseArgs(int argc, char* const argv[]) {
   for (int i = 1; i < argc; ++i) {
@@ -95,11 +96,11 @@ void ParseArgs(int argc, char* const argv[]) {
 	arg_val = s.substr(q + 1);
       }
     }
-    if (args.find(arg_name) == args.end()) {
+    if (args->find(arg_name) == args->end()) {
       cerr << arg_name << " is not a declared command line argument" << endl;
       exit(1);
     }
-    Rec& r = args[arg_name];
+    Rec& r = (*args)[arg_name];
     if (r.int_var)
       *r.int_var = atoi(arg_val.c_str());
     else if (r.double_var)
@@ -112,7 +113,9 @@ void ParseArgs(int argc, char* const argv[]) {
 }
 
 void CheckUndefined(string name) {
-  if (args.find(name) != args.end()) {
+  if (args == 0)
+    args = new map<string, Rec>;
+  if (args->find(name) != args->end()) {
     cerr << "The flag " << name << " has multiple definitions." << endl;
     exit(1);
   }
@@ -120,28 +123,28 @@ void CheckUndefined(string name) {
 
 void define_args_int(const char* arg, int* var, const char* comment) {
   CheckUndefined(arg);
-  Rec& r = args[arg];
+  Rec& r = (*args)[arg];
   r.comment = comment;
   r.int_var = var;
 }  
 
 void define_args_bool(const char* arg, bool* var, const char* comment) {
   CheckUndefined(arg);
-  Rec& r = args[arg];
+  Rec& r = (*args)[arg];
   r.comment = comment;
   r.bool_var = var;
 }
 
 void define_args_double(const char* arg, double* var, const char* comment) {
   CheckUndefined(arg);
-  Rec& r = args[arg];
+  Rec& r = (*args)[arg];
   r.comment = comment;
   r.double_var = var;
 }
 
 void define_args_string(const char* arg, string* var, const char* comment) {
   CheckUndefined(arg);
-  Rec& r = args[arg];
+  Rec& r = (*args)[arg];
   r.comment = comment;
   r.string_var = var;
 }
