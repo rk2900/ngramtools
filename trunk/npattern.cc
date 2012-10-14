@@ -815,9 +815,9 @@ void NgramInfoCollector::Init(const Vlist& args) {
   if (args.HasLabel(":log-count"))
     log_count_ = true;
   if (args.HasLabel(":uniq-count"))
-      uniq_count_ = true;
+    uniq_count_ = true;
   if (args.HasLabel(":allow-partial-match"))
-      allow_partial_match_ = true;
+    allow_partial_match_ = true;
 }
 
 class PrintNgram : public NgramInfoCollector {

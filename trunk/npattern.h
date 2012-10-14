@@ -103,7 +103,7 @@ public:
    public:
     virtual ~Printer() {}
     virtual void Print(const string& key) {
-      cout << key << endl;
+      cout << key;
     }
   };
 

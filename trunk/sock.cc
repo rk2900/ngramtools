@@ -93,7 +93,7 @@ struct in_addr *atoaddr(const char *address)
        just pass NULL.  Note that all modern unixes will close file
        descriptors for you on exit, so this is not required. */
 
-int get_connection(int socket_type, u_short port, int *listener)
+int get_connection(int socket_type, short port, int *listener)
 {
   struct sockaddr_in address;
   int listening_socket;

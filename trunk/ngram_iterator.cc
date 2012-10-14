@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include <map>
 #include <assert.h>
 #include <zlib.h>

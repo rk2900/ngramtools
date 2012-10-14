@@ -5,6 +5,8 @@
  *              GNU GENERAL PUBLIC LICENSE version 2 or later
  */
 
+#include <cstring>
+
 #include "ngram.h"
 
 const string kDivider = "><";
